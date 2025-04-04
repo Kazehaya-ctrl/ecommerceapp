@@ -7,8 +7,11 @@ import {
 	TouchableOpacity,
 	View,
 	Dimensions,
+	SafeAreaView,
+	StatusBar,
 } from "react-native";
 import { useEffect, useState } from "react";
+import { Link } from "@react-navigation/native";
 
 interface products {
 	id: number;
@@ -21,11 +24,11 @@ interface products {
 		count: number;
 	};
 	image: string;
-	title?: string; // Adding title since the API seems to use this instead of name
+	title?: string;
 }
 
 const { width } = Dimensions.get("window");
-const cardWidth = width / 2 - 24; // Two cards per row with spacing
+const cardWidth = width / 2 - 24;
 
 export default function HomeScreen() {
 	const [products, setProducts] = useState<products[]>([]);
@@ -74,30 +77,46 @@ export default function HomeScreen() {
 	);
 
 	return (
-		<View style={styles.container}>
-			<Text style={styles.headerTitle}>Featured Products</Text>
-			<FlatList
-				data={products}
-				renderItem={renderProductCard}
-				keyExtractor={(item) => item.id.toString()}
-				numColumns={2}
-				contentContainerStyle={styles.productGrid}
-				showsVerticalScrollIndicator={false}
-				columnWrapperStyle={styles.columnWrapper}
-			/>
-		</View>
+		<SafeAreaView style={styles.container}>
+			<StatusBar backgroundColor="white" barStyle="dark-content" />
+			<View style={styles.contentContainer}>
+				<Text style={styles.headerTitle}>Featured Products</Text>
+				<FlatList
+					data={products}
+					renderItem={renderProductCard}
+					keyExtractor={(item) => item.id.toString()}
+					numColumns={2}
+					contentContainerStyle={styles.productGrid}
+					showsVerticalScrollIndicator={false}
+					columnWrapperStyle={styles.columnWrapper}
+				/>
+			</View>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
+	productTitle: {
+		fontSize: 12, // Reduced from 14 to 12
+		fontWeight: "500", // Changed from 600 to 500 for better readability at small size
+		marginBottom: 8,
+		height: 36, // Slightly reduced from 40 to 36
+		lineHeight: 18, // Adding lineHeight to improve readability
+	},
 	container: {
 		flex: 1,
 		backgroundColor: "white",
 		paddingTop: 16,
 	},
+	contentContainer: {
+		flex: 1,
+		paddingTop:
+			Platform.OS === "android" ? StatusBar.currentHeight || 20 : 0,
+	},
 	headerTitle: {
 		fontSize: 24,
 		fontWeight: "700",
+		marginTop: 16,
 		marginHorizontal: 16,
 		marginBottom: 16,
 	},
@@ -109,6 +128,9 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	cardContainer: {
+		flex: 1,
+		paddingTop:
+			Platform.OS === "android" ? StatusBar.currentHeight || 20 : 0,
 		width: cardWidth,
 		backgroundColor: "#fff",
 		borderRadius: 16,
@@ -139,12 +161,6 @@ const styles = StyleSheet.create({
 		color: "#777",
 		textTransform: "uppercase",
 		marginBottom: 4,
-	},
-	productTitle: {
-		fontSize: 14,
-		fontWeight: "600",
-		marginBottom: 8,
-		height: 40, // Restrict height to show 2 lines
 	},
 	productFooter: {
 		flexDirection: "row",
